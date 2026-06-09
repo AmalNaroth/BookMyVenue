@@ -1,0 +1,7 @@
+# melos.yaml
+
+name: book_my_venue
+
+packages:
+  - apps/**
+  - packages/**
