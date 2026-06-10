@@ -17,7 +17,7 @@ class HomePage extends StatelessWidget {
 
         return Scaffold(
           appBar: BmvAppBar(
-            title: 'Book My Venue',
+            title: 'Owner Dashboard',
             actions: [
               TextButton(
                 onPressed: state.isSubmitting
@@ -34,9 +34,12 @@ class HomePage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Home', style: Theme.of(context).textTheme.headlineMedium),
+                Text(
+                  'Owner Home',
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
                 const SizedBox(height: 12),
-                Text('Signed in as ${user?.email ?? 'Unknown user'}'),
+                Text('Signed in as ${user?.email ?? 'Unknown owner'}'),
                 if (user?.displayName case final displayName?
                     when displayName.isNotEmpty) ...[
                   const SizedBox(height: 8),

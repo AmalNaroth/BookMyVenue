@@ -1,10 +1,12 @@
+import 'package:design_system/design_system.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../router/route_paths.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
-import '../widgets/auth_text_field.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -43,83 +45,64 @@ class _SignUpPageState extends State<SignUpPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 420),
-              child: BlocBuilder<AuthBloc, AuthState>(
-                builder: (context, state) {
-                  return Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'Create account',
-                          style: Theme.of(context).textTheme.headlineMedium,
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Start booking venues with your account.',
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                        const SizedBox(height: 32),
-                        AuthTextField(
-                          controller: _nameController,
-                          labelText: 'Full name',
-                          textInputAction: TextInputAction.next,
-                          validator: _validateName,
-                        ),
-                        const SizedBox(height: 16),
-                        AuthTextField(
-                          controller: _emailController,
-                          labelText: 'Email',
-                          keyboardType: TextInputType.emailAddress,
-                          textInputAction: TextInputAction.next,
-                          validator: _validateEmail,
-                        ),
-                        const SizedBox(height: 16),
-                        AuthTextField(
-                          controller: _passwordController,
-                          labelText: 'Password',
-                          obscureText: true,
-                          textInputAction: TextInputAction.done,
-                          validator: _validatePassword,
-                        ),
-                        if (state.errorMessage != null) ...[
-                          const SizedBox(height: 16),
-                          Text(
-                            state.errorMessage!,
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.error,
-                            ),
-                          ),
-                        ],
-                        const SizedBox(height: 24),
-                        FilledButton(
-                          onPressed: state.isSubmitting ? null : _submit,
-                          child: state.isSubmitting
-                              ? const SizedBox.square(
-                                  dimension: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : const Text('Create account'),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
+    return AuthScreenShell(
+      title: 'Create account',
+      subtitle: 'Join Book My Venue and reserve your next space in minutes.',
+      badgeText: 'START BOOKING',
+      icon: Icons.auto_awesome_rounded,
+      child: BlocBuilder<AuthBloc, AuthState>(
+        builder: (context, state) {
+          return Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                AuthTextField(
+                  controller: _nameController,
+                  labelText: 'Full name',
+                  prefixIcon: Icons.person_outline_rounded,
+                  textInputAction: TextInputAction.next,
+                  validator: _validateName,
+                ),
+                const SizedBox(height: 16),
+                AuthTextField(
+                  controller: _emailController,
+                  labelText: 'Email address',
+                  prefixIcon: Icons.mail_outline_rounded,
+                  keyboardType: TextInputType.emailAddress,
+                  textInputAction: TextInputAction.next,
+                  validator: _validateEmail,
+                ),
+                const SizedBox(height: 16),
+                AuthTextField(
+                  controller: _passwordController,
+                  labelText: 'Password',
+                  prefixIcon: Icons.lock_outline_rounded,
+                  obscureText: true,
+                  textInputAction: TextInputAction.done,
+                  validator: _validatePassword,
+                ),
+                if (state.errorMessage != null) ...[
+                  const SizedBox(height: 16),
+                  _AuthMessage(message: state.errorMessage!),
+                ],
+                const SizedBox(height: 24),
+                AppPrimaryButton(
+                  label: 'Create account',
+                  isLoading: state.isSubmitting,
+                  onPressed: _submit,
+                ),
+                const SizedBox(height: 12),
+                AppSecondaryButton(
+                  label: 'Back to sign in',
+                  isDisabled: state.isSubmitting,
+                  onPressed: () => context.go(RoutePaths.login),
+                ),
+              ],
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
@@ -147,5 +130,32 @@ class _SignUpPageState extends State<SignUpPage> {
       return 'Password must be at least 6 characters.';
     }
     return null;
+  }
+}
+
+class _AuthMessage extends StatelessWidget {
+  const _AuthMessage({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF7F1D1D).withValues(alpha: 0.30),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: const Color(0xFFFCA5A5).withValues(alpha: 0.4),
+        ),
+      ),
+      child: Text(
+        message,
+        style: const TextStyle(
+          color: Color(0xFFFECACA),
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
   }
 }

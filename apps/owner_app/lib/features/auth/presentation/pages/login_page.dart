@@ -55,10 +55,11 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return AuthScreenShell(
-      title: 'Welcome back',
-      subtitle: 'Find and book premium venues with a smooth, secure account.',
-      badgeText: 'BOOK MY VENUE',
-      icon: Icons.event_available_rounded,
+      title: 'Owner login',
+      subtitle:
+          'Manage bookings, venue details, and availability from one place.',
+      badgeText: 'OWNER PORTAL',
+      icon: Icons.storefront_rounded,
       child: BlocConsumer<AuthBloc, AuthState>(
         listenWhen: (previous, current) =>
             !previous.passwordResetEmailSent && current.passwordResetEmailSent,
@@ -113,7 +114,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 12),
                 AppSecondaryButton(
-                  label: 'Create an account',
+                  label: 'Create an owner account',
                   isDisabled: state.isSubmitting,
                   onPressed: () => context.go(RoutePaths.signUp),
                 ),

@@ -8,20 +8,22 @@ import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class SignUpPage extends StatefulWidget {
+  const SignUpPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<SignUpPage> createState() => _SignUpPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _SignUpPageState extends State<SignUpPage> {
   final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
   @override
   void dispose() {
+    _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -33,40 +35,22 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     context.read<AuthBloc>().add(
-      AuthSignInRequested(
+      AuthSignUpRequested(
+        name: _nameController.text,
         email: _emailController.text,
         password: _passwordController.text,
       ),
     );
   }
 
-  void _sendPasswordReset() {
-    final email = _emailController.text.trim();
-    if (email.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Enter your email first.')));
-      return;
-    }
-
-    context.read<AuthBloc>().add(AuthPasswordResetRequested(email));
-  }
-
   @override
   Widget build(BuildContext context) {
     return AuthScreenShell(
-      title: 'Welcome back',
-      subtitle: 'Find and book premium venues with a smooth, secure account.',
-      badgeText: 'BOOK MY VENUE',
-      icon: Icons.event_available_rounded,
-      child: BlocConsumer<AuthBloc, AuthState>(
-        listenWhen: (previous, current) =>
-            !previous.passwordResetEmailSent && current.passwordResetEmailSent,
-        listener: (context, state) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Password reset email sent.')),
-          );
-        },
+      title: 'Create owner account',
+      subtitle: 'List venues, receive bookings, and grow your business.',
+      badgeText: 'BECOME A PARTNER',
+      icon: Icons.business_center_rounded,
+      child: BlocBuilder<AuthBloc, AuthState>(
         builder: (context, state) {
           return Form(
             key: _formKey,
@@ -74,6 +58,14 @@ class _LoginPageState extends State<LoginPage> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisSize: MainAxisSize.min,
               children: [
+                AuthTextField(
+                  controller: _nameController,
+                  labelText: 'Full name',
+                  prefixIcon: Icons.person_outline_rounded,
+                  textInputAction: TextInputAction.next,
+                  validator: _validateName,
+                ),
+                const SizedBox(height: 16),
                 AuthTextField(
                   controller: _emailController,
                   labelText: 'Email address',
@@ -91,31 +83,21 @@ class _LoginPageState extends State<LoginPage> {
                   textInputAction: TextInputAction.done,
                   validator: _validatePassword,
                 ),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: state.isSubmitting ? null : _sendPasswordReset,
-                    child: const Text(
-                      'Forgot password?',
-                      style: TextStyle(color: Color(0xFFC4B5FD)),
-                    ),
-                  ),
-                ),
                 if (state.errorMessage != null) ...[
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 16),
                   _AuthMessage(message: state.errorMessage!),
                 ],
                 const SizedBox(height: 24),
                 AppPrimaryButton(
-                  label: 'Sign in',
+                  label: 'Create account',
                   isLoading: state.isSubmitting,
                   onPressed: _submit,
                 ),
                 const SizedBox(height: 12),
                 AppSecondaryButton(
-                  label: 'Create an account',
+                  label: 'Back to sign in',
                   isDisabled: state.isSubmitting,
-                  onPressed: () => context.go(RoutePaths.signUp),
+                  onPressed: () => context.go(RoutePaths.login),
                 ),
               ],
             ),
@@ -123,6 +105,13 @@ class _LoginPageState extends State<LoginPage> {
         },
       ),
     );
+  }
+
+  String? _validateName(String? value) {
+    if ((value ?? '').trim().isEmpty) {
+      return 'Name is required.';
+    }
+    return null;
   }
 
   String? _validateEmail(String? value) {
