@@ -1,6 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-
+import 'package:core/di/injection.dart' as di;
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -8,6 +8,7 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await di.setupDI();
   runApp(const MyApp());
 }
 
